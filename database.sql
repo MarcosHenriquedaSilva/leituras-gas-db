@@ -1,21 +1,42 @@
-CREATE TABLE unidades (
-    id SERIAL PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    endereco VARCHAR(200)
+
+CREATE TABLE companies (
+    company_id SERIAL PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE moradores (
-    id SERIAL PRIMARY KEY,
-    nome VARCHAR(150) NOT NULL,
-    email VARCHAR(150),
-    telefone VARCHAR(20),
-    unidade_id INTEGER REFERENCES unidades(id)
+
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(200) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    company_id INTEGER REFERENCES companies(company_id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE leituras_gas (
-    id SERIAL PRIMARY KEY,
-    unidade_id INTEGER REFERENCES unidades(id),
-    leitura NUMERIC(10,2) NOT NULL,
-    data_leitura DATE NOT NULL DEFAULT CURRENT_DATE,
-    registrado_por VARCHAR(150)
+CREATE TABLE units (
+    unit_id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    company_id INTEGER REFERENCES companies(company_id),
+    address VARCHAR(255) NOT NULL,
+    meter_number VARCHAR(100) UNIQUE,     
+    status VARCHAR(20) NOT NULL DEFAULT 'active',  
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE readings (
+    reading_id SERIAL PRIMARY KEY,
+    unit_id INTEGER NOT NULL REFERENCES units(unit_id) ON DELETE CASCADE,
+    value NUMERIC(10,2) NOT NULL,
+    reading_date DATE NOT NULL,
+    recorded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    note TEXT   
+);
+
+
+-- ÍNDICES para performance
+
+CREATE INDEX idx_readings_unit ON readings(unit_id);
+CREATE INDEX idx_units_user ON units(user_id);
+CREATE INDEX idx_users_email ON users(email);
