@@ -35,8 +35,4 @@ CREATE TABLE readings (
 );
 
 
--- ÍNDICES para performance
 
-CREATE INDEX idx_readings_unit ON readings(unit_id);
-CREATE INDEX idx_units_user ON units(user_id);
-CREATE INDEX idx_users_email ON users(email);
